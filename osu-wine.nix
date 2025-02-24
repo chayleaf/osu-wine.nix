@@ -35,14 +35,18 @@ let
       ) (builtins.readDir d)
     );
   # ps0322 breaks linking
-  patchList = builtins.filter (x: !lib.hasInfix "/ps0322-" x) (
-    collectPatches (fetchFromGitHub {
-      owner = "whrvt";
-      repo = "wine-osu-patches";
-      rev = "15f50183571e8c7068a70454cafd18a14ba56b12";
-      hash = "sha256-EhsRzbarkB5EOnwm/mXybeohhruGGJPTFVJym3PmxZQ=";
-    })
-  );
+  patchList =
+    map (x: if lib.hasSuffix "/disable-ime-envvar.patch" x then ./disable-ime-envvar.patch else x)
+      (
+        builtins.filter (x: !lib.hasInfix "/ps0322-" x) (
+          collectPatches (fetchFromGitHub {
+            owner = "whrvt";
+            repo = "wine-osu-patches";
+            rev = "15f50183571e8c7068a70454cafd18a14ba56b12";
+            hash = "sha256-EhsRzbarkB5EOnwm/mXybeohhruGGJPTFVJym3PmxZQ=";
+          })
+        )
+      );
   disabled = [ "eventfd_synchronization" ];
 in
 assert lib.versions.majorMinor wineUnstable.version == lib.versions.majorMinor patch.version;
