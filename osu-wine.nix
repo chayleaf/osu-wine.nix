@@ -16,19 +16,30 @@
 with callPackage "${path}/pkgs/applications/emulators/wine/util.nix" { };
 
 let
-  patch = (callPackage ./sources.nix { }).staging;
+  patch = wineUnstable.src.staging;
   build-inputs = pkgNames: extra: (mkBuildInputs wineUnstable.pkgArches pkgNames) ++ extra;
   patches = fetchFromGitHub {
     owner = "whrvt";
     repo = "wine-osu-patches";
-    rev = "15f50183571e8c7068a70454cafd18a14ba56b12";
-    hash = "sha256-EhsRzbarkB5EOnwm/mXybeohhruGGJPTFVJym3PmxZQ=";
+    rev = "d8e838ab993128bb056d068687a96118e9e99bd9";
+    hash = "sha256-UfzbnqSoONKLlEGWcMXRALaZS25VuBvdd+D/6xy6fsw=";
   };
-  disabled = [ "eventfd_synchronization" ];
+  disabled = [
+    "dsound-EAX"
+    "ntdll-Junction_Points"
+    "mountmgr-DosDevices"
+    "ntdll-NtDevicePath"
+    "ws2_32-af_unix"
+    "eventfd_synchronization"
+  ];
+  env = {
+    NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
+  };
 in
 assert lib.versions.majorMinor wineUnstable.version == lib.versions.majorMinor patch.version;
 
 (wineUnstable.override { wineRelease = "staging"; }).overrideAttrs (self: {
+  inherit env;
   buildInputs = build-inputs (
     [
       "perl"
