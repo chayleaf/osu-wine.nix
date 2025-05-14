@@ -25,10 +25,12 @@ let
     hash = "sha256-EhsRzbarkB5EOnwm/mXybeohhruGGJPTFVJym3PmxZQ=";
   };
   disabled = [ "eventfd_synchronization" ];
+  env.NIX_CFLAGS_COMPILE = "-Wno-error=incompatible-pointer-types";
 in
 assert lib.versions.majorMinor wineUnstable.version == lib.versions.majorMinor patch.version;
 
 (wineUnstable.override { wineRelease = "staging"; }).overrideAttrs (self: {
+  inherit env;
   buildInputs = build-inputs (
     [
       "perl"
