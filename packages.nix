@@ -80,7 +80,7 @@ with src;
       mingwW64.buildPackages.gcc
     ];
     monos = [ mono ];
-    buildScript = replaceVars "${path}/pkgs/applications/emulators/wine/builder-wow.sh" {
+    buildScript = replaceVars /${path}/pkgs/applications/emulators/wine/builder-wow.sh {
       # pkgconfig has trouble picking the right architecture
       pkgconfig64remove = lib.makeSearchPathOutput "dev" "lib/pkgconfig" [
         pkgs.glib
